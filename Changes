@@ -1,0 +1,5 @@
+Revision history for Perl extension AnyEvent::Mac::Pasteboard.
+
+0.01  Thu Apr 23 01:31:53 2013
+	- original version; created by h2xs 1.23 with options
+		-AX -n AnyEvent::Mac::Pasteboard
