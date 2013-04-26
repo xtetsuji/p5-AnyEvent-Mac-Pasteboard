@@ -24,12 +24,8 @@ sub new {
     my $interval    = delete $args{interval}    || $DEFAULT_INTERVAL;
     my $multibyte   = delete $args{multibyte}   || 1; # 1 is TRUE
 
-    my $prev_content = my $current_content = Mac::Pasteboard::pbpaste();
-
     if (   !defined $interval
-        #or (ref $interval eq 'ARRAY' && @$interval != grep { /$NATURAL_NUMBER_RE/ } @$interval )
         or (ref $interval eq 'ARRAY' && @$interval != grep { looks_like_number($_) && $_ > 0 } @$interval )
-        #or (!ref $interval && $interval !~ /$NATURAL_NUMBER_RE/ ) ) {
         or (!ref $interval && !looks_like_number($interval) ) ) {
         $on_error->(qq(argument "interval" is natural number or arrayref contained its.));
     }
@@ -39,25 +35,42 @@ sub new {
 
     my $self = bless {}, $class;
 
+    my ($previous_content, $current_content);
+    $previous_content = $current_content = $self->{content}
+        = Mac::Pasteboard::pbpaste(); # initialize
     $self->{multibyte} = $multibyte;
 
-    my $on_time; $on_time = sub {
+    my $on_time_core = sub {
         $current_content = $self->{content} = Mac::Pasteboard::pbpaste();
-        if ( $prev_content ne $current_content ) {
+        if ( $previous_content ne $current_content ) {
             $on_change->($self->pbpaste());
-            $prev_content = $current_content;
+            $previous_content = $current_content;
             $interval_idx = 0;
         }
         elsif ( $on_unchange && ref $on_unchange eq 'CODE' ) {
             $on_unchange->($self->pbpaste());
         }
-        my $wait_sec = $interval_idx < @interval ? $interval[$interval_idx++] : $interval[-1];
-        $self->{timer} = AE::timer $wait_sec, 0, $on_time;
     };
-    # TODO: If interval has only 1 digit, then using AE::timer's interval.
-    #       Is this implementation low cost than now implementation?
 
-    $on_time->();
+    my $on_time;
+    if ( @interval == 1 ) {
+        #$on_time = $on_time_core;
+        $self->{timer} = AE::timer 0, $interval[0], $on_time_core;
+    }
+    else {
+        $on_time = sub {
+            $on_time_core->();
+            my $wait_sec = $interval_idx < @interval ? $interval[$interval_idx++] : $interval[-1];
+            $self->{timer} = AE::timer $wait_sec, 0, $on_time;
+        };
+
+        ### On first initial run, hidden "on_unchange" callback.
+        ### $on_unchange is lexical, so we can not "local"ize it.
+        my $on_unchange_stash = $on_unchange;
+        $on_unchange = undef;
+        $on_time->();
+        $on_unchange = $on_unchange_stash;
+    }
 
     return $self;
 }
