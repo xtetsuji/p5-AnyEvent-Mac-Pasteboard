@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use lib qw(lib);
 
-use Test::More;
+use Test::More tests => 2;
 use AnyEvent;
 use AnyEvent::Mac::Pasteboard;
 
@@ -55,5 +55,3 @@ my $paste_tick2 = new_ok( 'AnyEvent::Mac::Pasteboard', [
 my $timeout = AE::timer $TIMEOUT_SEC, 0, sub { $cv->send(); };
 
 $cv->recv;
-
-done_testing();

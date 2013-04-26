@@ -52,7 +52,6 @@ sub new {
             $on_unchange->($self->pbpaste());
         }
         my $wait_sec = $interval_idx < @interval ? $interval[$interval_idx++] : $interval[-1];
-        print "wait_sec=$wait_sec\n";
         $self->{timer} = AE::timer $wait_sec, 0, $on_time;
     };
     # TODO: If interval has only 1 digit, then using AE::timer's interval.
