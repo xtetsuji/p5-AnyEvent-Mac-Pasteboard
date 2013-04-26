@@ -27,9 +27,9 @@ sub new {
     my $prev_content = my $current_content = Mac::Pasteboard::pbpaste();
 
     if (   !defined $interval
-#        or (ref $interval eq 'ARRAY' && @$interval != grep { /$NATURAL_NUMBER_RE/ } @$interval )
+        #or (ref $interval eq 'ARRAY' && @$interval != grep { /$NATURAL_NUMBER_RE/ } @$interval )
         or (ref $interval eq 'ARRAY' && @$interval != grep { looks_like_number($_) && $_ > 0 } @$interval )
-#        or (!ref $interval && $interval !~ /$NATURAL_NUMBER_RE/ ) ) {
+        #or (!ref $interval && $interval !~ /$NATURAL_NUMBER_RE/ ) ) {
         or (!ref $interval && !looks_like_number($interval) ) ) {
         $on_error->(qq(argument "interval" is natural number or arrayref contained its.));
     }
@@ -44,19 +44,19 @@ sub new {
     my $on_time; $on_time = sub {
         $current_content = $self->{content} = Mac::Pasteboard::pbpaste();
         if ( $prev_content ne $current_content ) {
-            my $content = $self->pbpaste();
-            $on_change->($content);
+            $on_change->($self->pbpaste());
             $prev_content = $current_content;
             $interval_idx = 0;
         }
         elsif ( $on_unchange && ref $on_unchange eq 'CODE' ) {
-            my $content = $self->pbpaste();
-            $on_unchange->($content);
+            $on_unchange->($self->pbpaste());
         }
         my $wait_sec = $interval_idx < @interval ? $interval[$interval_idx++] : $interval[-1];
         print "wait_sec=$wait_sec\n";
         $self->{timer} = AE::timer $wait_sec, 0, $on_time;
     };
+    # TODO: If interval has only 1 digit, then using AE::timer's interval.
+    #       Is this implementation low cost than now implementation?
 
     $on_time->();
 
@@ -86,7 +86,7 @@ AnyEvent::Mac::Pasteboard - observation and hook pasteboard changing.
   my $cv = AnyEvent->condvar;
   
   my $pb_watcher = AnyEvent::Mac::Pasteboard->new(
-    interval => [1, 1, 2, 3, 5],
+    interval => [1, 1, 2, 3, 5], # see following key specify description.
     on_change => sub {
       my $pb_content = shift;
       print "change pasteboard content: $pb_content\n";
@@ -103,10 +103,101 @@ AnyEvent::Mac::Pasteboard - observation and hook pasteboard changing.
   
   $cv->recv;
 
-=head1 DESCRIPTIONS
+=head1 DESCRIPTION
+
+This module is observation and hook Mac OS X pasteboard changing.
+
+=head1 METHODS
+
+=head2 AnyEvent::Mac::Pasteboard->new( ... )
+
+ my $pb_watcher = AnyEvent::Mac::Pasteboard->new( ... );
+
+This object runs at recv'ing AnyEvent->condver.
+
+new gives key value pairs as argument.
+
+=over
+
+=item * interval => POSITIVE_DIGIT or ARRAYREF having POSITIVE_DIGITS
+
+Specify pasteboard observation interval.
+
+ interval => 2, # per 2 seconds.
+
+or
+
+ # 1st 0.5 second, 2nd 0.5 too, 3rd, 1 second, ...
+ # and last per 5 seconds interval.
+ interval => [0.5, 0.5, 1, 2, 3, 4, 5],
+
+This key is optional.
+Default interval is defined by $AnyEvent::Mac::Pasteboard::DEFAULT_INTERVAL.
+
+ perl -MAnyEvent::Mac::Pasteboard -E 'say $AnyEvent::Mac::Pasteboard::DEFAULT_INTERVAL;'
+
+=item * on_change => CALLBACK
+
+ on_change => sub {
+    my $pb_content = shift;
+    print qq(Run on_change. pasteboard content is "$pb_content"\n);
+ },
+
+While this module observates per specified interval,
+if it detects pasteboard changing at per observation,
+then call this "on_change" callback.
+
+This callback gives changed new pasteboard content at 1st argument.
+
+=item * on_unchagnge => CALLBACK
+
+ on_unchange => sub {
+    my $pb_content = shift;
+    print "Run on_unchange.\n" if DEBUG;
+ },
+
+The converse of "on_change" callback.
+
+This callback may be using at DEBUG.
+
+=item * on_error => CALLBACK
+
+This callback "on_error" is called at error occuring.
+
+However this callback is BETA STATUS,
+so it may obsolute at future release.
+
+=item * multibyte => BOOL
+
+It seems Mac::Pasteboard#pbpaste() (given pasteboard content subroutine) is
+broken multibyte UTF-8 characters.
+
+Because this AnyEvent::Mac::Pasteboard is used low cost Mac::Pasteboard#pbpate()
+as observation, high cost external command call `pbpaste` as content pick-up.
+
+If you use only singlebyte UTF-8 characters (ASCII only),
+then it is no problem this flag is false.
+However if you use multibyte UTF-8 character,
+then let this flag true for safety.
+
+Default is false.
+
+=back
+
+=head1 SEE ALSO
+
+L<Mac::Pasteboard>,
+man 1 pbpaste
 
 =head1 AUTHOR
 
-=head1 COPYRIGHT AND LICENSES
+OGATA Tetsuji, E<lt>ogata {at} gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by OGATA Tetsuji
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
