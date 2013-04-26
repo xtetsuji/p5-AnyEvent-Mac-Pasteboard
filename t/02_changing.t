@@ -1,5 +1,3 @@
-# -*- perl -*-
-
 use strict;
 use warnings;
 use lib qw(lib);
@@ -19,7 +17,7 @@ binmode STDERR, ':utf8';
 
 my $cv = AE::cv;
 
-my @dictionary = (qw(FINE ☀ CLOUD ☁ RAIN ☂ ☃ ☆ ★ ♬ ♪ ♫));
+my @dictionary = (qw(FINE ☀ ☁ CLOUD RAIN ☂ ☃ ☆ ★ ♬ ♪ ♫));
 
 diag("This test rewrite your current pasteboard. And do not edit pasteboard on running this test.");
 
