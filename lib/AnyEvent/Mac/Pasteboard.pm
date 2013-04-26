@@ -52,13 +52,11 @@ sub new {
         }
     };
 
-    my $on_time;
     if ( @interval == 1 ) {
-        #$on_time = $on_time_core;
         $self->{timer} = AE::timer 0, $interval[0], $on_time_core;
     }
     else {
-        $on_time = sub {
+        my $on_time; $on_time = sub {
             $on_time_core->();
             my $wait_sec = $interval_idx < @interval ? $interval[$interval_idx++] : $interval[-1];
             $self->{timer} = AE::timer $wait_sec, 0, $on_time;
