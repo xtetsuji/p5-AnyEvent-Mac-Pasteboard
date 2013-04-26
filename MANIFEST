@@ -4,4 +4,5 @@ MANIFEST
 README
 t/00_compile.t
 t/01_construct.t
+t/02_changing.t
 lib/AnyEvent/Mac/Pasteboard.pm
