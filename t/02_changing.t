@@ -58,3 +58,6 @@ my $error = $cv->recv();
 if ( $error ) {
     failed($error);
 }
+
+# cleanup pasteboard
+system(qq{bash -c 'echo -n "" | pbcopy'});
