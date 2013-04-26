@@ -9,8 +9,9 @@ use Test::More tests => TEST_COUNT;
 
 use AnyEvent;
 use AnyEvent::Mac::Pasteboard ();
-use Time::HiRes;
 use Encode;
+use File::Temp;
+use Time::HiRes;
 
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
@@ -20,6 +21,11 @@ my $cv = AE::cv;
 my @dictionary = (qw(FINE ☀ ☁ CLOUD RAIN ☂ ☃ ☆ ★ ♬ ♪ ♫));
 
 diag("This test rewrite your current pasteboard. And do not edit pasteboard on running this test.");
+
+### stash pasteboard content.
+my $tmp_file = File::Temp->new( SUFFIX => '.pb' );
+my $tmp_filename = $tmp_file->filename;
+print {$tmp_file} `pbpaste`;
 
 my $onchange_call_count = 0;
 my $previous_content = '';
@@ -57,5 +63,12 @@ if ( $error ) {
     failed($error);
 }
 
-# cleanup pasteboard
-system(qq{bash -c 'echo -n "" | pbcopy'});
+### revert pasteboard content.
+if ( open my $fh, '<', $tmp_filename ) {
+    my $pb_content = do { local $/; <$fh>; };
+    close $fh;
+    if ( open my $pipe, '|-', 'pbcopy' ) {
+        print {$pipe} $pb_content;
+        close $pipe;
+    }
+}
