@@ -174,8 +174,8 @@ This callback may be using at DEBUG.
 
 This callback "on_error" is called at error occuring.
 
-However this callback is BETA STATUS,
-so it may obsolute at future release.
+However this callback is B<BETA STATUS>,
+so it may be obsoluted at future release.
 
 =item * multibyte => BOOL
 
@@ -183,9 +183,9 @@ It seems Mac::Pasteboard#pbpaste() (given pasteboard content subroutine) is
 broken multibyte UTF-8 characters.
 
 Because this AnyEvent::Mac::Pasteboard is used low cost Mac::Pasteboard#pbpate()
-as observation, high cost external command call `pbpaste` as content pick-up.
+as observation, high cost external command call `pbpaste` as picking up content.
 
-If you use only singlebyte UTF-8 characters (ASCII only),
+If you use only single byte UTF-8 characters (ASCII only),
 then it is no problem this flag is false.
 However if you use multibyte UTF-8 character,
 then let this flag true for safety.
@@ -197,6 +197,7 @@ Default is false.
 =head1 SEE ALSO
 
 L<Mac::Pasteboard>,
+
 man 1 pbpaste
 
 =head1 AUTHOR
