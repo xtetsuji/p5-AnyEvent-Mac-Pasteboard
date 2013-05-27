@@ -13,6 +13,8 @@ WriteMakefile(
     PREREQ_PM      => {
         'AnyEvent'        => 0,
         'Mac::Pasteboard' => 0,
+        'Scalar::Util'    => 0,
+        'Time::HiRes'     => 0,
     },
     PMLIBDIRS      => ["lib"],
     META_MERGE     => {
