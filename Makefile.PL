@@ -9,7 +9,7 @@ WriteMakefile(
     NAME           => 'AnyEvent::Mac::Pasteboard',
     VERSION_FROM   => 'lib/AnyEvent/Mac/Pasteboard.pm', # finds $VERSION
     ABSTRACT_FROM  => 'lib/AnyEvent/Mac/Pasteboard.pm',
-    AUTHOR         => 'OGATA Tetsuji <tetsuji.ogata at cpan.org>',
+    AUTHOR         => 'OGATA Tetsuji <tetsuji.ogata at gmail.com>',
     PREREQ_PM      => {
         'AnyEvent'        => 0,
         'Mac::Pasteboard' => 0,
