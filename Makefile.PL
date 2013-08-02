@@ -3,6 +3,9 @@
 use strict;
 use warnings;
 
+$^O eq 'darwin'
+    or die "OS unsupported\n";
+
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
