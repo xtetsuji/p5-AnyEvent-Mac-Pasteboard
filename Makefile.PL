@@ -24,7 +24,7 @@ WriteMakefile(
             repository => 'git://github.com/xtetsuji/p5-AnyEvent-Mac-Pasteboard.git',
         },
     },
-    LISENSE        => "perl",
+    LICENSE        => "perl",
     PL_FILES       => {},
     EXE_FILES      => [],
     dist           => {
