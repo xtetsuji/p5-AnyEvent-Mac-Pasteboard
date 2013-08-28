@@ -2,6 +2,8 @@ Changes
 INSTALL.md
 MANIFEST
 MANIFEST.SKIP
+META.json
+META.yml
 Makefile.PL
 README.md
 cpanfile
