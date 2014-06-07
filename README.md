@@ -1,6 +1,3 @@
-AnyEvent-Mac-Pasteboard version 0.01
-======================================
-
 # NAME
 
 AnyEvent::Mac::Pasteboard - observation and hook pasteboard changing.
@@ -10,10 +7,8 @@ AnyEvent::Mac::Pasteboard - observation and hook pasteboard changing.
     use AnyEvent;
     use AnyEvent::Mac::Pasteboard;
     
-
     my $cv = AnyEvent->condvar;
     
-
     my $pb_watcher = AnyEvent::Mac::Pasteboard->new(
       interval => [1, 1, 2, 3, 5], # see following key specify description.
       on_change => sub {
@@ -30,7 +25,6 @@ AnyEvent::Mac::Pasteboard - observation and hook pasteboard changing.
       },
     );
     
-
     $cv->recv;
 
 # DESCRIPTION
@@ -92,15 +86,15 @@ new gives key value pairs as argument.
 
     This callback "on\_error" is called at error occuring.
 
-    However this callback is __BETA STATUS__,
+    However this callback is **BETA STATUS**,
     so it may be obsoluted at future release.
 
 - multibyte => BOOL
 
-    It seems Mac::Pasteboard\#pbpaste() (given pasteboard content subroutine) is
+    It seems Mac::Pasteboard#pbpaste() (given pasteboard content subroutine) is
     broken multibyte UTF-8 characters.
 
-    Because this AnyEvent::Mac::Pasteboard is used low cost Mac::Pasteboard\#pbpate()
+    Because this AnyEvent::Mac::Pasteboard is used low cost Mac::Pasteboard#pbpate()
     as observation, high cost external command call \`pbpaste\` as picking up content.
 
     If you use only single byte UTF-8 characters (ASCII only),
@@ -112,13 +106,13 @@ new gives key value pairs as argument.
 
 # SEE ALSO
 
-[Mac::Pasteboard](http://search.cpan.org/perldoc?Mac::Pasteboard),
+[Mac::Pasteboard](https://metacpan.org/pod/Mac::Pasteboard),
 
 man 1 pbpaste
 
 # AUTHOR
 
-OGATA Tetsuji, <ogata {at} gmail.com>
+OGATA Tetsuji, <tetsuji.ogata {at} gmail.com>
 
 # COPYRIGHT AND LICENSE
 

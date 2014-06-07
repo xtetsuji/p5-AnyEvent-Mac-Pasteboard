@@ -202,7 +202,7 @@ man 1 pbpaste
 
 =head1 AUTHOR
 
-OGATA Tetsuji, E<lt>ogata {at} gmail.comE<gt>
+OGATA Tetsuji, E<lt>tetsuji.ogata {at} gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
