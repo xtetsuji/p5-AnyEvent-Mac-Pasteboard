@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::Mac::Pasteboard.
 
+0.02  Sun Juu 21 04:17:00 2015
+	- Fixed bug that multiple line contains pasteboard
+
 0.01  Thu Aug 22 20:50:57 2013
 	- original version; created by h2xs 1.23 with options
 		-AX -n AnyEvent::Mac::Pasteboard

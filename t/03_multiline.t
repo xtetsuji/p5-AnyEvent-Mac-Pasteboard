@@ -3,7 +3,7 @@ use warnings;
 use lib qw(lib);
 use utf8;
 
-use constant TEST_COUNT => 4;
+use constant TEST_COUNT => 1;
 
 use Test::More tests => TEST_COUNT;
 
@@ -16,50 +16,46 @@ use Time::HiRes;
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 
+# This test use `printf` rather than `echo`, because echo has many
+# difference in each other system implement.
+
 my $cv = AE::cv;
 
-my @dictionary = (qw(FINE ☀ ☁ CLOUD RAIN ☂ ☃ ☆ ★ ♬ ♪ ♫));
+diag( "AnyEvent::Mac::Pasteboard is " . $INC{"AnyEvent/Mac/Pasteboard.pm"} );
 
 diag("This test rewrite your current pasteboard. And do not edit pasteboard on running this test.");
 
 ### stash pasteboard content.
 my $tmp_file = File::Temp->new( SUFFIX => '.pb' );
 my $tmp_filename = $tmp_file->filename;
-print {$tmp_file} `pbpaste`;
+print {$tmp_file} `/usr/bin/pbpaste`;
 
-my $onchange_call_count = 0;
-my $previous_content = '';
+my $content = encode('utf-8', "multiple line\nsecond line\nthird line");
+system(qq{printf "DIFFERENT CONTENT" | pbcopy});
+
 my $paste_tick = AnyEvent::Mac::Pasteboard->new(
+    interval  => 1,
     multibyte => 1,
-    interval  => 2,
     on_change => sub {
-        $onchange_call_count++;
         my $current_content = shift;
-        isnt($current_content, $previous_content, "Catch changing pasteboard status");
-        $cv->send() if $onchange_call_count == TEST_COUNT;
-        $previous_content = $current_content;
-    },
-    on_unchange => sub {
-        my $current_content = shift;
-        fail("changing test is not ok. prev=$previous_content cur=$current_content");
-        $cv->send("Error");
+        diag(qq/current_content="$current_content" content="$content"/);
+        if ( $current_content eq $content ) {
+            pass("getting multiline correctly");
+            $cv->send();
+        }
     },
 );
-
-my $dictionary_idx = 0;
-my $system_pbcopy_cb = sub {
-    my $word = encode('utf-8', $dictionary[ $dictionary_idx++ % @dictionary ]);
-    system(qq{printf "$word" | pbcopy});
+my $rewrite_timer = AE::timer 2, 0, sub {
+    system(qq{printf "$content" | pbcopy});
 };
-$system_pbcopy_cb->(); # initialize at first.
-
-sleep 1;
-
-my $pbpaste_system_tick = AE::timer 0, 0.3, $system_pbcopy_cb;
+my $end_timer = AE::timer 4, 0, sub {
+    $cv->send("timeout");
+};
 
 my $error = $cv->recv();
 
 if ( $error ) {
+    diag("pasteboard is " . `pbpaste`);
     fail($error);
 }
 

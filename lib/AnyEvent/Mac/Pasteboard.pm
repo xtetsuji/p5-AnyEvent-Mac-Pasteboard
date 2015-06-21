@@ -3,7 +3,7 @@ package AnyEvent::Mac::Pasteboard;
 use strict;
 use warnings;
 use 5.008;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use AnyEvent;
 use Mac::Pasteboard ();
@@ -75,7 +75,7 @@ sub new {
 
 sub pbpaste {
     my $self = shift;
-    return $self->{multibyte} ? `pbpaste` : $self->{content};
+    return $self->{multibyte} ? scalar(`pbpaste`) : $self->{content};
 }
 
 1;
