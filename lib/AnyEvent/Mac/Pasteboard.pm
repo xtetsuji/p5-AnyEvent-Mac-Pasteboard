@@ -3,7 +3,7 @@ package AnyEvent::Mac::Pasteboard;
 use strict;
 use warnings;
 use 5.008;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use AnyEvent;
 use Mac::Pasteboard ();
@@ -42,6 +42,7 @@ sub new {
 
     my $on_time_core = sub {
         $current_content = $self->{content} = Mac::Pasteboard::pbpaste();
+        $current_content = '' if !defined $current_content;
         if ( $previous_content ne $current_content ) {
             $on_change->($self->pbpaste());
             $previous_content = $current_content;
@@ -92,9 +93,9 @@ AnyEvent::Mac::Pasteboard - observation and hook pasteboard changing.
 
   use AnyEvent;
   use AnyEvent::Mac::Pasteboard;
-  
+
   my $cv = AnyEvent->condvar;
-  
+
   my $pb_watcher = AnyEvent::Mac::Pasteboard->new(
     interval => [1, 1, 2, 3, 5], # see following key specify description.
     on_change => sub {
@@ -110,7 +111,7 @@ AnyEvent::Mac::Pasteboard - observation and hook pasteboard changing.
        die $error;
     },
   );
-  
+
   $cv->recv;
 
 =head1 DESCRIPTION
